@@ -7,7 +7,7 @@ import HomeIcon from '../../assets/home.svg'
 import TruckIcon from '../../assets/truck.svg'
 import BoxAdd from '../../assets/box-add.svg'
 import SvgUri from 'react-native-svg-uri'
-import { StyleSheet, Text } from 'react-native'
+import { Platform, StyleSheet, Text } from 'react-native'
 import { useFonts } from 'expo-font'
 
 const Tab = createBottomTabNavigator()
@@ -15,10 +15,6 @@ const iconSelectedColor = '#40CFFC'
 const iconUnSelectColor = '#3696FF'
 
 export const HomeTabs = () => {
-
-
-
-
 
     const tabBarLabel = ({ focused, color, position, children }: any) => (
         null
@@ -83,6 +79,7 @@ const style = StyleSheet.create({
         left: 20,
         right: 20,
         borderRadius: 100,
+        padding: Platform.OS === 'ios' ? 25 : 0,
     },
     shadow: {
         shadowColor: '#000000CA',
