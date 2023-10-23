@@ -1,20 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { HomeTabs } from "./src/pages/home/home_page";
+import { useFonts } from 'expo-font';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+const Stack = createNativeStackNavigator();
+
+function App() {
+
+    const [fontsLoaded, fontsError] = useFonts({
+        'RobotoSerif-Bold': require('./src/assets/fonts/static/RobotoSerif-Bold.ttf'),
+        'RobotoSerif-SemiBoldItalic': require('./src/assets/fonts/static/RobotoSerif-SemiBoldItalic.ttf'),
+    });
+
+    if (!fontsLoaded) return null
+    return (
+        <NavigationContainer>
+            <Stack.Navigator initialRouteName={"HomeTabs"}>
+                <Stack.Screen options={{ headerShown: false }} name="HomeTabs" component={HomeTabs} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App; 
