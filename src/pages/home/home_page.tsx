@@ -27,6 +27,7 @@ export const HomeTabs = () => {
                 ...style.shadow
             }
         })} >
+
             <Tab.Screen
                 name="Barcode"
                 component={BarCodePage}
