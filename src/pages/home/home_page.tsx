@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import BarCodePage from '../barcode/barcode_page'
 import TruckPage from '../truck/truck_page'
 import BoxPage from '../box/box_page'
+import LoginPage from '../login/login_page'
 import HomeIcon from '../../assets/home.svg'
 import TruckIcon from '../../assets/truck.svg'
 import BoxAdd from '../../assets/box-add.svg'
@@ -27,6 +28,20 @@ export const HomeTabs = () => {
                 ...style.shadow
             }
         })} >
+
+            <Tab.Screen
+                name="LoginPage"
+                component={LoginPage}
+                options={{
+                    headerShown: false,
+                    tabBarLabel: tabBarLabel,
+                    tabBarIcon: ({ focused }) =>
+                        <SvgUri
+                            fill={focused ? iconSelectedColor : iconUnSelectColor}
+                            source={HomeIcon}
+                        />
+                }}
+            />
             <Tab.Screen
                 name="Barcode"
                 component={BarCodePage}

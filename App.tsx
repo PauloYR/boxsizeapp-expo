@@ -6,13 +6,6 @@ import { useFonts } from 'expo-font';
 const Stack = createNativeStackNavigator();
 
 function App() {
-
-    const [fontsLoaded, fontsError] = useFonts({
-        'RobotoSerif-Bold': require('./src/assets/fonts/static/RobotoSerif-Bold.ttf'),
-        'RobotoSerif-SemiBoldItalic': require('./src/assets/fonts/static/RobotoSerif-SemiBoldItalic.ttf'),
-    });
-
-    if (!fontsLoaded) return null
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={"HomeTabs"}>
