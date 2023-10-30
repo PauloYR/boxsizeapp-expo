@@ -1,18 +1,29 @@
+import { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { HomeTabs } from "./src/pages/home/home_page";
 import { useFonts } from 'expo-font';
+import { loadFonts } from './src/styles/fontConfig'; 
+
 
 const Stack = createNativeStackNavigator();
 
 function App() {
 
-    const [fontsLoaded, fontsError] = useFonts({
-        'RobotoSerif-Bold': require('./src/assets/fonts/static/RobotoSerif-Bold.ttf'),
-        'RobotoSerif-SemiBoldItalic': require('./src/assets/fonts/static/RobotoSerif-SemiBoldItalic.ttf'),
-    });
+    const [fontLoaded, setFontLoaded] = useState(false);
 
-    if (!fontsLoaded) return null
+    useEffect(() => {
+      async function loadApp() {
+        await loadFonts(); // Carrega as fontes
+        setFontLoaded(true);
+      }
+  
+      loadApp();
+    }, []);
+
+  if (!fontLoaded) {
+    return null; // Ou um componente de carregamento, se preferir
+  }
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={"HomeTabs"}>
