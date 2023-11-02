@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     SafeAreaView,
     TextInput,
@@ -18,7 +18,7 @@ import styleButton from '../../styles/button'
 import Input from '../../component/input';
 import { useNavigation } from '@react-navigation/native';
 
-import { getAuth, Persistence,signInWithEmailAndPassword, setPersistence, browserLocalPersistence  } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword,signInWithEmailAndPassword  } from "firebase/auth";
 
 const LoginPage = () => {
 
@@ -29,42 +29,18 @@ const LoginPage = () => {
     const { passwordVisibility, rightIcon, handlePasswordVisibility } =
         useTogglePasswordVisibility();
 
-        const checkUserAuthentication = () => {
-            getAuth().onAuthStateChanged((user) => {
-              if (user) {
-                // O usuário está logado
-                navigation.navigate("HomeTabs");
-                console.log('O usuário está logado:', user);
-                // Aqui você pode navegar para a tela principal do aplicativo ou executar outras ações.
-              } else {
-                // O usuário não está logado
-                console.log('O usuário não está logado.');
-                // Navegue para a tela de login ou realize outras ações.
-              }
-            });
-          };
-
-    useEffect(() =>{
-        checkUserAuthentication()
-    },[])
-
-    const loginUser = ()=>{
-
+    const createUser = ()=>{
         const auth = getAuth();
-        setPersistence(auth,browserLocalPersistence)
-        .then(() => {
-            // Agora você pode fazer login
-            return signInWithEmailAndPassword(auth, email, pass)
+        createUserWithEmailAndPassword(auth, email, pass)
             .then((userCredential) => { 
              const user = userCredential.user;
-             navigation.navigate("HomeTabs")
-             console.log(user)
+             console.log(user);
         })
             .catch((error) => {
+             console.log("n deu bom");
              const errorCode = error.code;
              const errorMessage = error.message;
         });
-          })
     }
 
     return (
@@ -88,23 +64,23 @@ const LoginPage = () => {
                         <Text style={style.label}>Senha:</Text>
                         <Input onChangeText={(text) => setPass(text)} value={pass} secureTextEntry={passwordVisibility} placeholder="*********" />
                         <TouchableOpacity 
-                            onPress={loginUser}
+                            onPress={createUser}
                             style={{
                                 ...styleButton.buttomPrimary,
                                 ...style.button
                             }}>
                             <Text style={styleButton.buttonTextPrimary}>
-                                Login
+                                Cadastrar
                             </Text>
                         </TouchableOpacity>
                         <Text style={{
                             ...style.label,
                             marginTop: 12.57,
-                        }} 
-                            onPress={() => {
-                                navigation.navigate("CreatePage")
+                        }}                         
+                        onPress={() => {
+                                navigation.navigate("LoginPage")
                             }}
-                        >Ainda não tem cadastro? Crie sua conta agora.</Text>
+                        >Já passui cadastro? Entrar em sua conta. </Text>
                     </View>
                 </View>
             </Container>

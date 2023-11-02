@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent,useState } from 'react';
 import { TextInput, StyleSheet, View } from 'react-native';
+
 
 interface InputProps {
   placeholder?: string;
