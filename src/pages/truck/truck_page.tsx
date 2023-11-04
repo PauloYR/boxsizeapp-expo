@@ -1,47 +1,78 @@
-import React from 'react';
-import {
-    SafeAreaView,
-    StatusBar,
-    Text,
-    useColorScheme,
-    TouchableOpacity
-} from 'react-native';
+import React from "react";
+import { StatusBar, Text, TouchableOpacity, View } from "react-native";
 
-import {
-    Colors,
-} from 'react-native/Libraries/NewAppScreen';
-import Input from '../../component/input';
-import Container from '../../component/container';
-import styleText from '../../styles/text'
-import styleButton from '../../styles/button'
+import Container from "../../component/container";
+import SvgUri from "react-native-svg-uri";
+import Box from "../../assets/truck-transport.svg";
+import Input from "../../component/input";
+import styleButton from "../../styles/button";
+import { useFonts } from "expo-font";
 
 const TruckPage = () => {
-    const isDarkMode = useColorScheme() === 'dark';
 
-    const backgroundStyle = {
-        backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-    };
+	return (
+		<View
+			style={{
+				backgroundColor: "#D3E9F7",
+			}}
+		>
+			<StatusBar barStyle={"light-content"} backgroundColor="#3696FF" />
 
-    return (
-        <SafeAreaView style={backgroundStyle}>
-            <StatusBar
-                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-                backgroundColor={backgroundStyle.backgroundColor}
-            />
-            <Container>
-                <Text style={styleText.title}>Cadastro de veiculos</Text>
-                <Input placeholder='Altura' />
-                <Input placeholder='Largura' />
-                <Input placeholder='Profundidade' />
-                <Input placeholder='Tipo' />
-                <TouchableOpacity
-                    style={styleButton.buttomPrimary}>
-                    <Text style={styleButton.buttonTextPrimary}>Cadastrar</Text>
-                </TouchableOpacity>
-
-            </Container>
-        </SafeAreaView>
-    );
-}
+			<View
+				style={{
+					backgroundColor: "#3696FF",
+					height: "25%",
+					borderBottomLeftRadius: 24,
+					borderBottomRightRadius: 24,
+					display: "flex",
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "center",
+					gap: 20,
+				}}
+			>
+				<SvgUri source={Box} />
+				<View>
+					<Text
+						style={{
+							fontSize: 32,
+							fontFamily: "RobotoSerif-Bold",
+							color: "#fff",
+						}}
+					>
+						Cadastro
+					</Text>
+					<Text
+						style={{
+							fontSize: 24,
+							fontFamily: "RobotoSerif-SemiBoldItalic",
+							color: "#fff",
+						}}
+					>
+						de transportes
+					</Text>
+				</View>
+			</View>
+			<Container>
+				<View
+					style={{
+						position: "absolute",
+						width: "80%",
+						top: -18,
+						gap: 8,
+					}}
+				>
+					<Input placeholder="Altura" />
+					<Input placeholder="Largura" />
+					<Input placeholder="Profundidade" />
+					<Input placeholder="Tipo" />
+					<TouchableOpacity style={styleButton.buttomPrimary}>
+						<Text style={styleButton.buttonTextPrimary}>Cadastrar</Text>
+					</TouchableOpacity>
+				</View>
+			</Container>
+		</View>
+	);
+};
 
 export default TruckPage;
