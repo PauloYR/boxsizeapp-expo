@@ -2,13 +2,13 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import BarCodePage from '../barcode/barcode_page'
 import TruckPage from '../truck/truck_page'
-import BoxPage from '../box/box_page'
 import HomeIcon from '../../assets/home.svg'
 import TruckIcon from '../../assets/truck.svg'
 import BoxAdd from '../../assets/box-add.svg'
 import SvgUri from 'react-native-svg-uri'
 import { Platform, StyleSheet, Text } from 'react-native'
 import { useFonts } from 'expo-font'
+import ScannerBarCodePage from '../scanner_bar_code/scanner_bar_code_page'
 
 const Tab = createBottomTabNavigator()
 const iconSelectedColor = '#40CFFC'
@@ -54,8 +54,8 @@ export const HomeTabs = () => {
                         />
                 }} />
             <Tab.Screen
-                name="box"
-                component={BoxPage}
+                name="scannerBarCodePage"
+                component={ScannerBarCodePage}
                 options={{
                     headerShown: false,
                     tabBarLabel: tabBarLabel,

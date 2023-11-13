@@ -6,7 +6,7 @@ const styleButton = StyleSheet.create({
         paddingHorizontal: 12,
         elevation: 8,
         borderRadius: 10,
-        backgroundColor: "#40CFFC"
+        backgroundColor: "#3696FF"
     },
     buttonTextPrimary: {
         fontSize: 18,
