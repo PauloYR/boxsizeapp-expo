@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     StatusBar,
     Text,
@@ -10,6 +10,8 @@ import SvgUri from 'react-native-svg-uri';
 import BarCode from '../../assets/barcode.svg'
 import Input from '../../component/input';
 import styleButton from '../../styles/button'
+import ItemBox from './components/item_box';
+import ContainerSpaceArea from './components/container_space_area';
 
 interface DividerProps {
     message?: string
@@ -17,6 +19,11 @@ interface DividerProps {
 
 interface PorcentProps {
     value: number
+}
+
+interface ItemBox {
+    boxName: string
+    qtd: number
 }
 
 const ScannerBarCodePage = () => {
@@ -44,6 +51,25 @@ const ScannerBarCodePage = () => {
             </View>
         )
     }
+
+    const [availableArea, setAvailableArea] = useState(20)
+    const [usedArea, setUsedArea] = useState(20)
+
+    const [boxAddeds, setBoxAddeds] = useState<Array<ItemBox>>([
+        {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        },
+        {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        },
+        {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }
+    ])
+
 
 
     return (
@@ -89,14 +115,19 @@ const ScannerBarCodePage = () => {
                         top: -18,
                         gap: 8,
                         display: 'flex',
-
                     }}>
-                        <Input placeholder='Caminhão' />
-                        <Input placeholder='Caixa XPTO' />
-                        <Divider message='OU' />
+                        <Input
+                            placeholder='Caminhão' />
+                        <Input
+                            placeholder='Caixa XPTO' />
+                        <Divider
+                            message='OU' />
                         <TouchableOpacity
                             style={styleButton.buttomPrimary}>
-                            <Text style={styleButton.buttonTextPrimary}>Ler Barcode</Text>
+                            <Text
+                                style={styleButton.buttonTextPrimary}>
+                                Ler Barcode
+                            </Text>
                         </TouchableOpacity>
                         <Text style={{
                             flex: 100,
@@ -106,10 +137,26 @@ const ScannerBarCodePage = () => {
                         }}>
                             Porcentagem de carregamento
                         </Text>
-                        <Porcent value={90} />
-                        <View style={{ borderRadius: 20, backgroundColor: "#fff" }}>
+                        <Porcent
+                            value={90} />
+                        <ContainerSpaceArea
+                            availableArea={availableArea}
+                            usedArea={usedArea} />
+                        {
+                            boxAddeds.map((value, index) => {
+                                return <ItemBox
+                                    remove={() => {
+                                        const novoArray = [
+                                            ...boxAddeds.slice(0, index),
+                                            ...boxAddeds.slice(index + 1)
+                                        ];
 
-                        </View>
+                                        setBoxAddeds(novoArray);
+                                    }}
+                                    boxName={value.boxName}
+                                    qtd={value.qtd} />
+                            })
+                        }
                     </View>
                 </Container>
             </View >

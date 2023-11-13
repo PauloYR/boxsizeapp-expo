@@ -21,7 +21,7 @@ export const HomeTabs = () => {
     )
 
     return (
-        <Tab.Navigator initialRouteName={"barcode"} screenOptions={({ route }) => ({
+        <Tab.Navigator initialRouteName={"scannerBarCodePage"} screenOptions={({ route }) => ({
             tabBarStyle: {
                 ...style.tabMenuBottom,
                 ...style.shadow

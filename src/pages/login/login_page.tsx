@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     TextInput,
@@ -18,7 +18,7 @@ import styleButton from '../../styles/button'
 import Input from '../../component/input';
 import { useNavigation } from '@react-navigation/native';
 
-import { getAuth, Persistence,signInWithEmailAndPassword, setPersistence, browserLocalPersistence  } from "firebase/auth";
+import { getAuth, Persistence, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
 
 const LoginPage = () => {
 
@@ -29,42 +29,42 @@ const LoginPage = () => {
     const { passwordVisibility, rightIcon, handlePasswordVisibility } =
         useTogglePasswordVisibility();
 
-        const checkUserAuthentication = () => {
-            getAuth().onAuthStateChanged((user) => {
-              if (user) {
+    const checkUserAuthentication = () => {
+        getAuth().onAuthStateChanged((user) => {
+            if (user) {
                 // O usuário está logado
                 navigation.navigate("HomeTabs");
                 console.log('O usuário está logado:', user);
                 // Aqui você pode navegar para a tela principal do aplicativo ou executar outras ações.
-              } else {
+            } else {
                 // O usuário não está logado
                 console.log('O usuário não está logado.');
                 // Navegue para a tela de login ou realize outras ações.
-              }
-            });
-          };
-
-    useEffect(() =>{
-        checkUserAuthentication()
-    },[])
-
-    const loginUser = ()=>{
-
-        const auth = getAuth();
-        setPersistence(auth,browserLocalPersistence)
-        .then(() => {
-            // Agora você pode fazer login
-            return signInWithEmailAndPassword(auth, email, pass)
-            .then((userCredential) => { 
-             const user = userCredential.user;
-             navigation.navigate("HomeTabs")
-             console.log(user)
-        })
-            .catch((error) => {
-             const errorCode = error.code;
-             const errorMessage = error.message;
+            }
         });
-          })
+    };
+
+    useEffect(() => {
+        checkUserAuthentication()
+    }, [])
+
+    const loginUser = () => {
+
+        // const auth = getAuth();
+        // setPersistence(auth,browserLocalPersistence)
+        // .then(() => {
+        //     // Agora você pode fazer login
+        //     return signInWithEmailAndPassword(auth, email, pass)
+        //     .then((userCredential) => { 
+        //      const user = userCredential.user;
+        navigation.navigate("HomeTabs")
+        //      console.log(user)
+        // })
+        //     .catch((error) => {
+        //      const errorCode = error.code;
+        //      const errorMessage = error.message;
+        // });
+        //   })
     }
 
     return (
@@ -87,7 +87,7 @@ const LoginPage = () => {
                         <Input onChangeText={(text) => setEmail(text)} value={email} placeholder='Usuário' />
                         <Text style={style.label}>Senha:</Text>
                         <Input onChangeText={(text) => setPass(text)} value={pass} secureTextEntry={passwordVisibility} placeholder="*********" />
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={loginUser}
                             style={{
                                 ...styleButton.buttomPrimary,
@@ -100,7 +100,7 @@ const LoginPage = () => {
                         <Text style={{
                             ...style.label,
                             marginTop: 12.57,
-                        }} 
+                        }}
                             onPress={() => {
                                 navigation.navigate("CreatePage")
                             }}
