@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+    ScrollView,
     StatusBar,
     Text,
     TouchableOpacity,
@@ -63,6 +64,27 @@ const ScannerBarCodePage = () => {
         {
             boxName: 'Caixa XPTO',
             qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
+        }, {
+            boxName: 'Caixa XPTO',
+            qtd: 10
         },
         {
             boxName: 'Caixa XPTO',
@@ -112,51 +134,56 @@ const ScannerBarCodePage = () => {
                     <View style={{
                         position: 'absolute',
                         width: "80%",
-                        top: -18,
+                        top: "-20%",
                         gap: 8,
                         display: 'flex',
+                        height: '66%'
                     }}>
-                        <Input
-                            placeholder='Caminhão' />
-                        <Input
-                            placeholder='Caixa XPTO' />
-                        <Divider
-                            message='OU' />
-                        <TouchableOpacity
-                            style={styleButton.buttomPrimary}>
-                            <Text
-                                style={styleButton.buttonTextPrimary}>
-                                Ler Barcode
+                        <ScrollView >
+                            <View style={{ height: 190 }} />
+                            <Input
+                                placeholder='Caminhão' />
+                            <Input
+                                placeholder='Caixa XPTO' />
+                            <Divider
+                                message='OU' />
+                            <TouchableOpacity
+                                style={styleButton.buttomPrimary}>
+                                <Text
+                                    style={styleButton.buttonTextPrimary}>
+                                    Ler Barcode
+                                </Text>
+                            </TouchableOpacity>
+                            <Text style={{
+                                flex: 100,
+                                textAlign: "center",
+                                color: "#3696FF",
+                                fontFamily: 'RobotoSerif-Bold',
+                            }}>
+                                Porcentagem de carregamento
                             </Text>
-                        </TouchableOpacity>
-                        <Text style={{
-                            flex: 100,
-                            textAlign: "center",
-                            color: "#3696FF",
-                            fontFamily: 'RobotoSerif-Bold',
-                        }}>
-                            Porcentagem de carregamento
-                        </Text>
-                        <Porcent
-                            value={90} />
-                        <ContainerSpaceArea
-                            availableArea={availableArea}
-                            usedArea={usedArea} />
-                        {
-                            boxAddeds.map((value, index) => {
-                                return <ItemBox
-                                    remove={() => {
-                                        const novoArray = [
-                                            ...boxAddeds.slice(0, index),
-                                            ...boxAddeds.slice(index + 1)
-                                        ];
+                            <Porcent
+                                value={90} />
+                            <ContainerSpaceArea
+                                availableArea={availableArea}
+                                usedArea={usedArea} />
+                            {
+                                boxAddeds.map((value, index) => {
+                                    return <ItemBox
+                                        remove={() => {
+                                            const novoArray = [
+                                                ...boxAddeds.slice(0, index),
+                                                ...boxAddeds.slice(index + 1)
+                                            ];
 
-                                        setBoxAddeds(novoArray);
-                                    }}
-                                    boxName={value.boxName}
-                                    qtd={value.qtd} />
-                            })
-                        }
+                                            setBoxAddeds(novoArray);
+                                        }}
+                                        boxName={value.boxName}
+                                        qtd={value.qtd} />
+                                })
+                            }
+                            <View style={{ height: '35%' }} />
+                        </ScrollView>
                     </View>
                 </Container>
             </View >
