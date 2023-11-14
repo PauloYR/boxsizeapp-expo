@@ -11,6 +11,7 @@ import Box from '../../assets/box.svg'
 import Input from '../../component/input';
 import styleButton from '../../styles/button'
 import { useFonts } from 'expo-font';
+import styleToobar from '../../common/style/toolbar';
 
 const BarCodePage = () => {
 
@@ -25,17 +26,7 @@ const BarCodePage = () => {
                     barStyle={'light-content'}
                     backgroundColor='#3696FF'
                 />
-                <View style={{
-                    backgroundColor: '#3696FF',
-                    height: '25%',
-                    borderBottomLeftRadius: 24,
-                    borderBottomRightRadius: 24,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 20
-                }}>
+                <View style={styleToobar.toolbar}>
                     <SvgUri
                         source={Box}
                     />

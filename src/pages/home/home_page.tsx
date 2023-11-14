@@ -2,13 +2,15 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import BarCodePage from '../barcode/barcode_page'
 import TruckPage from '../truck/truck_page'
-import HomeIcon from '../../assets/box-add.svg'
+import HomeIcon from '../../assets/home.svg'
+import BoxAddIcon from '../../assets/box-add.svg'
 import TruckIcon from '../../assets/truck.svg'
-import BoxAdd from '../../assets/bar-code-menu.svg'
+import BarCodeIcon from '../../assets/bar-code-menu.svg'
 import SvgUri from 'react-native-svg-uri'
 import { Platform, StyleSheet, Text } from 'react-native'
 import { useFonts } from 'expo-font'
 import ScannerBarCodePage from '../scanner_bar_code/scanner_bar_code_page'
+import GraphicsPage from '../graphics/graphics_page'
 
 const Tab = createBottomTabNavigator()
 const iconSelectedColor = '#40CFFC'
@@ -29,6 +31,20 @@ export const HomeTabs = () => {
         })} >
 
             <Tab.Screen
+                name="GraphicsPage"
+                component={GraphicsPage}
+                options={{
+                    headerShown: false,
+                    tabBarLabel: tabBarLabel,
+                    tabBarIcon: ({ focused }) =>
+                        <SvgUri
+                            fill={focused ? iconSelectedColor : iconUnSelectColor}
+                            source={HomeIcon}
+                        />
+                }}
+            />
+
+            <Tab.Screen
                 name="Barcode"
                 component={BarCodePage}
                 options={{
@@ -37,7 +53,7 @@ export const HomeTabs = () => {
                     tabBarIcon: ({ focused }) =>
                         <SvgUri
                             fill={focused ? iconSelectedColor : iconUnSelectColor}
-                            source={HomeIcon}
+                            source={BoxAddIcon}
                         />
                 }}
             />
@@ -62,7 +78,7 @@ export const HomeTabs = () => {
                     tabBarIcon: ({ focused }) =>
                         <SvgUri
                             fill={focused ? iconSelectedColor : iconUnSelectColor}
-                            source={BoxAdd}
+                            source={BarCodeIcon}
                         />
                 }}
             />

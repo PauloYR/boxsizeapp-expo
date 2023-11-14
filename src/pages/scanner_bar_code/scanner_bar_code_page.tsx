@@ -13,6 +13,7 @@ import Input from '../../component/input';
 import styleButton from '../../styles/button'
 import ItemBox from './components/item_box';
 import ContainerSpaceArea from './components/container_space_area';
+import styleToobar from '../../common/style/toolbar';
 
 interface DividerProps {
     message?: string
@@ -103,17 +104,7 @@ const ScannerBarCodePage = () => {
                     barStyle={'light-content'}
                     backgroundColor='#3696FF'
                 />
-                <View style={{
-                    backgroundColor: '#3696FF',
-                    height: '25%',
-                    borderBottomLeftRadius: 24,
-                    borderBottomRightRadius: 24,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 20
-                }}>
+                <View style={styleToobar.toolbar}>
                     <SvgUri
                         source={BarCode}
                     />
