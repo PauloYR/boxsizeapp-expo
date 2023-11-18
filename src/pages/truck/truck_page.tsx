@@ -19,9 +19,9 @@ const TruckPage = () => {
 
 	const handleSubmit = () => {
 		push(listaRef, {
-			heigth,
-			width,
-			depth,
+			heigth: parseInt(heigth),
+			width: parseInt(width),
+			depth: parseInt(depth),
 			type
 		});
 	}

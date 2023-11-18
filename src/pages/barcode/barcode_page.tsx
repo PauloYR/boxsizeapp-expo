@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     StatusBar,
     Text,
@@ -12,9 +12,24 @@ import Input from '../../component/input';
 import styleButton from '../../styles/button'
 import { useFonts } from 'expo-font';
 import styleToobar from '../../common/style/toolbar';
+import { getDatabase, push, ref } from 'firebase/database';
 
 const BarCodePage = () => {
+    const listaRef = ref(getDatabase(), "box");
 
+    const [heigth, setHeigth] = useState("")
+    const [width, setWidth] = useState("")
+    const [depth, setDepth] = useState("")
+    const [name, setName] = useState("")
+
+    const handleSubmit = () => {
+        push(listaRef, {
+            heigth: parseInt(heigth),
+            width: parseInt(width),
+            depth: parseInt(depth),
+            name
+        });
+    }
 
     return (
         <>
@@ -50,12 +65,13 @@ const BarCodePage = () => {
                         top: -18,
                         gap: 8,
                     }}>
-                        <Input placeholder='Nome' />
-                        <Input placeholder='Altura' />
-                        <Input placeholder='Largura' />
-                        <Input placeholder='Profundidade' />
+                        <Input placeholder='Nome' setValue={setName} value={name} />
+                        <Input placeholder="Altura" setValue={setHeigth} value={heigth} />
+                        <Input placeholder="Largura" setValue={setWidth} value={width} />
+                        <Input placeholder="Profundidade" setValue={setDepth} value={depth} />
                         <TouchableOpacity
-                            style={styleButton.buttomPrimary}>
+                            style={styleButton.buttomPrimary}
+                            onPress={handleSubmit}>
                             <Text style={styleButton.buttonTextPrimary}>Cadastrar</Text>
                         </TouchableOpacity>
                     </View>
