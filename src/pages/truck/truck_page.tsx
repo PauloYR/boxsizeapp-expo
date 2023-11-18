@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StatusBar, Text, TouchableOpacity, View } from "react-native";
 
 import Container from "../../component/container";
@@ -6,10 +6,25 @@ import SvgUri from "react-native-svg-uri";
 import Box from "../../assets/truck-transport.svg";
 import Input from "../../component/input";
 import styleButton from "../../styles/button";
-import { useFonts } from "expo-font";
 import styleToobar from "../../common/style/toolbar";
+import { getDatabase, push, ref } from "firebase/database";
 
 const TruckPage = () => {
+	const listaRef = ref(getDatabase(), "truck");
+
+	const [heigth, setHeigth] = useState("")
+	const [width, setWidth] = useState("")
+	const [depth, setDepth] = useState("")
+	const [type, setType] = useState("")
+
+	const handleSubmit = () => {
+		push(listaRef, {
+			heigth,
+			width,
+			depth,
+			type
+		});
+	}
 
 	return (
 		<View
@@ -51,11 +66,13 @@ const TruckPage = () => {
 						gap: 8,
 					}}
 				>
-					<Input placeholder="Altura" />
-					<Input placeholder="Largura" />
-					<Input placeholder="Profundidade" />
-					<Input placeholder="Tipo" />
-					<TouchableOpacity style={styleButton.buttomPrimary}>
+					<Input placeholder="Altura" setValue={setHeigth} value={heigth} />
+					<Input placeholder="Largura" setValue={setWidth} value={width} />
+					<Input placeholder="Profundidade" setValue={setDepth} value={depth} />
+					<Input placeholder="Tipo" setValue={setType} value={type} />
+					<TouchableOpacity
+						style={styleButton.buttomPrimary}
+						onPress={handleSubmit}>
 						<Text style={styleButton.buttonTextPrimary}>Cadastrar</Text>
 					</TouchableOpacity>
 				</View>
