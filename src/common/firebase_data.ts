@@ -15,3 +15,10 @@ export interface BoxData {
     depth?: string
     id?: string
 }
+
+export interface BoxQtyInTruckData {
+    qty?: number
+    id?: string
+    key?: string
+    name?: string
+}

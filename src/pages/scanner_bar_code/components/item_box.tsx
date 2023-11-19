@@ -5,14 +5,14 @@ import Trash from '../../../assets/trash.svg'
 
 interface ItemBoxProps {
     boxName: string
-    qtd: number
+    qty: number
     remove: () => void
 }
 
 const ItemBox = (
     {
         boxName,
-        qtd,
+        qty,
         remove
     }: ItemBoxProps
 ) => {
@@ -31,7 +31,7 @@ const ItemBox = (
             {boxName}
         </Text>
 
-        <Input placeholder='QTD(1)' value={qtd.toString()} />
+        <Input placeholder='QTD(1)' value={qty.toString()} />
 
         <View style={{
             borderRadius: 10,

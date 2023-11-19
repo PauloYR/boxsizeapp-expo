@@ -17,9 +17,9 @@ import styleToobar from '../../common/style/toolbar';
 import { Dropdown } from 'react-native-element-dropdown';
 import Divider from './components/divider';
 import Porcent from './components/porcent';
-import { onValue, getDatabase, ref, onDisconnect, update, push } from 'firebase/database';
+import { onValue, getDatabase, ref, onDisconnect, push, remove } from 'firebase/database';
 import { err } from 'react-native-svg/lib/typescript/xml';
-import { BoxData, TruckData } from '../../common/firebase_data';
+import { BoxData, TruckData, BoxQtyInTruckData } from '../../common/firebase_data';
 
 interface ItemBox {
     boxName: string
@@ -43,7 +43,6 @@ const ScannerBarCodePage = () => {
 
         onValue(refTruck, (snapshot) => {
             const newData = snapshot.val();
-            console.log(newData)
             const arrayTruck: TruckData[] = []
             try {
                 for (let key in newData) {
@@ -93,7 +92,11 @@ const ScannerBarCodePage = () => {
     const [valueDropdownTruck, setValueDropdownTruck] = useState<TruckData>();
 
     useEffect(() => {
-        console.log(valueDropdownTruck?.name, valueDropdownTruck?.id, "truck")
+        getBoxNotUseds()
+        getBoxUseds()
+    }, [valueDropdownTruck, dataDropdownBox, dataDropdownTruck])
+
+    const getBoxNotUseds = () => {
         if (!valueDropdownTruck) {
             return
         }
@@ -114,50 +117,56 @@ const ScannerBarCodePage = () => {
             return true
         });
         setDataDropdownBoxShow(boxNotUseds)
-    }, [valueDropdownTruck, dataDropdownBox, dataDropdownTruck])
+    }
+
+    const getBoxUseds = () => {
+        if (!valueDropdownTruck) {
+            return
+        }
+
+        const truck = dataDropdownTruck.filter((truck) => truck.id === valueDropdownTruck?.id)[0];
+        if (truck?.boxs == null || typeof truck?.boxs === 'undefined') {
+            setBoxUseds([])
+            return
+        }
+
+        let boxUseds = dataDropdownBox.flatMap(function (box) {
+            for (let key in truck?.boxs) {
+                const boxInTruck = truck.boxs[key]
+                var boxQtyInTruckData: BoxQtyInTruckData = {
+                    key,
+                    id: boxInTruck.id,
+                    qty: boxInTruck.qty
+                }
+                if (boxInTruck.id === box.id) {
+                    boxQtyInTruckData.name = box.name
+                    return boxQtyInTruckData
+                }
+            }
+            return []
+        });
+
+        setBoxUseds(boxUseds)
+    }
+
+    const onRemoveItem = (index: number) => {
+        if (!boxUseds) {
+            return
+        }
+        const box = boxUseds[index]
+
+        const refItem = ref(getDatabase(), `truck/${valueDropdownTruck?.id}/boxs/${box.key}`)
+
+        remove(refItem)
+    }
+
+    const [boxUseds, setBoxUseds] = useState<BoxQtyInTruckData[]>()
 
     const [availableArea, setAvailableArea] = useState(20)
     const [usedArea, setUsedArea] = useState(20)
 
 
     const [valueDropdownBox, setValueDropdownBox] = useState<BoxData>();
-
-
-    const [boxAddeds, setBoxAddeds] = useState<Array<ItemBox>>([
-        {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        },
-        {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }, {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        },
-        {
-            boxName: 'Caixa XPTO',
-            qtd: 10
-        }
-    ])
 
     const addBoxHandler = () => {
         if (valueDropdownTruck?.name === "" || valueDropdownBox?.name === "") {
@@ -308,22 +317,18 @@ const ScannerBarCodePage = () => {
                                     availableArea={availableArea}
                                     usedArea={usedArea} />
                                 {
-                                    boxAddeds.map((value, index) => {
+                                    boxUseds?.map((value, index) => {
                                         return <ItemBox
+                                            key={value.key}
                                             remove={() => {
-                                                const novoArray = [
-                                                    ...boxAddeds.slice(0, index),
-                                                    ...boxAddeds.slice(index + 1)
-                                                ];
-
-                                                setBoxAddeds(novoArray);
+                                                onRemoveItem(index)
                                             }}
-                                            boxName={value.boxName}
-                                            qtd={value.qtd} />
+                                            boxName={value.name ?? ""}
+                                            qty={value?.qty ?? 0} />
                                     })
                                 }
                             </View>
-                            <View style={{ height: '37%' }} />
+                            <View style={{ height: 40 }} />
                         </ScrollView>
                     </View>
                 </Container>
