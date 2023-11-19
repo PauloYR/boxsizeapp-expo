@@ -24,12 +24,12 @@ const ItemBox = (
         padding: 5,
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
         paddingEnd: 20,
         paddingStart: 20,
+        gap: 18
     }}>
-        <Text>
+        <Text style={{ flex: 1 }}>
             {boxName}
         </Text>
 

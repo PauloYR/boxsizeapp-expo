@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     ScrollView,
     StatusBar,
@@ -20,6 +20,7 @@ import Porcent from './components/porcent';
 import { onValue, getDatabase, ref, onDisconnect, push, remove, update } from 'firebase/database';
 import { err } from 'react-native-svg/lib/typescript/xml';
 import { BoxData, TruckData, BoxQtyInTruckData } from '../../common/firebase_data';
+import { calculateAvailableSpace, calculateVolume } from '../../usecase/calculate_space';
 
 interface ItemBox {
     boxName: string
@@ -91,63 +92,30 @@ const ScannerBarCodePage = () => {
     }, [])
     const [valueDropdownTruck, setValueDropdownTruck] = useState<TruckData>();
 
-    useEffect(() => {
-        getBoxNotUseds()
-        getBoxUseds()
-    }, [valueDropdownTruck, dataDropdownBox, dataDropdownTruck])
 
-    const getBoxNotUseds = () => {
-        if (!valueDropdownTruck) {
-            return
-        }
 
-        const truck = dataDropdownTruck.filter((truck) => truck.id === valueDropdownTruck?.id)[0];
-
-        if (truck?.boxs == null || typeof truck?.boxs === 'undefined') {
-            setDataDropdownBoxShow(dataDropdownBox)
-            return
-        }
-        let boxNotUseds = dataDropdownBox.filter(function (box) {
-            for (let key in truck?.boxs) {
-                const boxId: string = truck.boxs[key].id
-                if (boxId === box.id) {
-                    return false
-                }
+    const getBoxNotUseds = useCallback(
+        (truck?: TruckData) => {
+            if (!valueDropdownTruck) {
+                return
             }
-            return true
-        });
-        setDataDropdownBoxShow(boxNotUseds)
-    }
-
-    const getBoxUseds = () => {
-        if (!valueDropdownTruck) {
-            return
-        }
-
-        const truck = dataDropdownTruck.filter((truck) => truck.id === valueDropdownTruck?.id)[0];
-        if (truck?.boxs == null || typeof truck?.boxs === 'undefined') {
-            setBoxUseds([])
-            return
-        }
-
-        let boxUseds = dataDropdownBox.flatMap(function (box) {
-            for (let key in truck?.boxs) {
-                const boxInTruck = truck.boxs[key]
-                var boxQtyInTruckData: BoxQtyInTruckData = {
-                    key,
-                    id: boxInTruck.id,
-                    qty: boxInTruck.qty
-                }
-                if (boxInTruck.id === box.id) {
-                    boxQtyInTruckData.name = box.name
-                    return boxQtyInTruckData
-                }
+            if (truck?.boxs == null || typeof truck?.boxs === 'undefined') {
+                setDataDropdownBoxShow(dataDropdownBox)
+                return
             }
-            return []
-        });
+            let boxNotUseds = dataDropdownBox.filter(function (box) {
+                for (let key in truck?.boxs) {
+                    const boxId: string = truck.boxs[key].id
+                    if (boxId === box.id) {
+                        return false
+                    }
+                }
+                return true
+            });
+            setDataDropdownBoxShow(boxNotUseds)
+        }, [dataDropdownBox, valueDropdownTruck, setDataDropdownBoxShow])
 
-        setBoxUseds(boxUseds)
-    }
+
 
     const onRemoveItem = async (index: number) => {
         if (!boxUseds) {
@@ -162,9 +130,65 @@ const ScannerBarCodePage = () => {
 
     const [boxUseds, setBoxUseds] = useState<BoxQtyInTruckData[]>()
 
-    const [availableArea, setAvailableArea] = useState(20)
-    const [usedArea, setUsedArea] = useState(20)
+    const [availableArea, setAvailableArea] = useState<number>()
 
+    const getSpaceTruck = useCallback((truck?: TruckData) => {
+        return calculateVolume(
+            parseFloat(truck?.heigth ?? ""),
+            parseFloat(truck?.width ?? ""),
+            parseFloat(truck?.depth ?? ""))
+    }, [valueDropdownTruck])
+
+    const getBoxUseds = useCallback(
+        (truck?: TruckData) => {
+            if (!valueDropdownTruck) {
+                return
+            }
+
+            if (truck?.boxs == null || typeof truck?.boxs === 'undefined') {
+                setBoxUseds([])
+                return
+            }
+
+            let boxUseds = dataDropdownBox.flatMap(function (box) {
+                for (let key in truck?.boxs) {
+                    const boxInTruck = truck.boxs[key]
+                    var boxQtyInTruckData: BoxQtyInTruckData = {
+                        key,
+                        dataBox: box,
+                        qty: boxInTruck.qty
+                    }
+                    if (boxInTruck.id === box.id) {
+                        return boxQtyInTruckData
+                    }
+                }
+                return []
+            });
+
+            setBoxUseds(boxUseds)
+        }, [valueDropdownTruck, dataDropdownBox, setBoxUseds])
+
+    const calculateAvaliableSpaceCallback = useCallback(
+        (spaceTotalTruck: number, boxs?: BoxQtyInTruckData[]) => calculateAvailableSpace(spaceTotalTruck, boxs),
+        [calculateAvailableSpace, valueDropdownTruck, boxUseds])
+
+    const getTruckSelected = useCallback(
+        () => dataDropdownTruck.filter((truck) => truck.id === valueDropdownTruck?.id).at(0)
+        , [dataDropdownTruck, valueDropdownTruck])
+
+    useEffect(() => {
+        const truck = getTruckSelected();
+        getBoxNotUseds(truck)
+        getBoxUseds(truck)
+    }, [valueDropdownTruck, dataDropdownTruck,])
+
+
+    useEffect(() => {
+        const truck = getTruckSelected();
+        const spaceTruck = getSpaceTruck(truck)
+        const avaliableArea = calculateAvaliableSpaceCallback(spaceTruck, boxUseds ?? [])
+        setAvailableArea(avaliableArea)
+    }, [valueDropdownTruck, boxUseds])
 
     const [valueDropdownBox, setValueDropdownBox] = useState<BoxData>();
 
@@ -185,13 +209,18 @@ const ScannerBarCodePage = () => {
 
 
 
-    const onChangeQtyBox = async (index: number, qty: number) => {
+    const onChangeQtyBox = async (index: number, qty?: number) => {
         const box = boxUseds?.at(index)
+
+        if (isNaN(qty ?? 0)) {
+            qty = 0
+        }
+
         const refBoxsByTruck = ref(getDatabase(), `truck/${valueDropdownTruck?.id}/boxs/${box?.key}`);
         try {
             await update(refBoxsByTruck, {
                 ...box,
-                qty
+                qty: qty
             })
         } catch (e) {
             console.error(e)
@@ -325,10 +354,9 @@ const ScannerBarCodePage = () => {
                                     Porcentagem de carregamento
                                 </Text>
                                 <Porcent
-                                    value={90} />
+                                    value={(availableArea ?? 0) * 100} />
                                 <ContainerSpaceArea
-                                    availableArea={availableArea}
-                                    usedArea={usedArea} />
+                                    availableArea={availableArea} />
                                 {
                                     boxUseds?.map((value, index) => {
                                         return <ItemBox
@@ -336,7 +364,7 @@ const ScannerBarCodePage = () => {
                                             remove={() => {
                                                 onRemoveItem(index)
                                             }}
-                                            boxName={value.name ?? ""}
+                                            boxName={value.dataBox?.name ?? ""}
                                             qty={value?.qty ?? 0}
                                             onChangeQty={(newQty) => {
                                                 onChangeQtyBox(index, newQty)

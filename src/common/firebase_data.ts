@@ -18,7 +18,6 @@ export interface BoxData {
 
 export interface BoxQtyInTruckData {
     qty?: number
-    id?: string
     key?: string
-    name?: string
+    dataBox?: BoxData
 }
