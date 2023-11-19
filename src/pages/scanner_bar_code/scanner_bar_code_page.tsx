@@ -17,7 +17,7 @@ import styleToobar from '../../common/style/toolbar';
 import { Dropdown } from 'react-native-element-dropdown';
 import Divider from './components/divider';
 import Porcent from './components/porcent';
-import { onValue, getDatabase, ref, onDisconnect, push, remove } from 'firebase/database';
+import { onValue, getDatabase, ref, onDisconnect, push, remove, update } from 'firebase/database';
 import { err } from 'react-native-svg/lib/typescript/xml';
 import { BoxData, TruckData, BoxQtyInTruckData } from '../../common/firebase_data';
 
@@ -149,7 +149,7 @@ const ScannerBarCodePage = () => {
         setBoxUseds(boxUseds)
     }
 
-    const onRemoveItem = (index: number) => {
+    const onRemoveItem = async (index: number) => {
         if (!boxUseds) {
             return
         }
@@ -157,7 +157,7 @@ const ScannerBarCodePage = () => {
 
         const refItem = ref(getDatabase(), `truck/${valueDropdownTruck?.id}/boxs/${box.key}`)
 
-        remove(refItem)
+        await remove(refItem)
     }
 
     const [boxUseds, setBoxUseds] = useState<BoxQtyInTruckData[]>()
@@ -168,14 +168,14 @@ const ScannerBarCodePage = () => {
 
     const [valueDropdownBox, setValueDropdownBox] = useState<BoxData>();
 
-    const addBoxHandler = () => {
+    const addBoxHandler = async () => {
         if (valueDropdownTruck?.name === "" || valueDropdownBox?.name === "") {
             console.log("Preencha os dados")
             return
         }
         const refTruckCurrent = ref(getDatabase(), `truck/${valueDropdownTruck?.id}/boxs`);
 
-        push(
+        await push(
             refTruckCurrent, {
             id: valueDropdownBox?.id
         });
@@ -184,6 +184,19 @@ const ScannerBarCodePage = () => {
     }
 
 
+
+    const onChangeQtyBox = async (index: number, qty: number) => {
+        const box = boxUseds?.at(index)
+        const refBoxsByTruck = ref(getDatabase(), `truck/${valueDropdownTruck?.id}/boxs/${box?.key}`);
+        try {
+            await update(refBoxsByTruck, {
+                ...box,
+                qty
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
 
     return (
         <>
@@ -324,7 +337,10 @@ const ScannerBarCodePage = () => {
                                                 onRemoveItem(index)
                                             }}
                                             boxName={value.name ?? ""}
-                                            qty={value?.qty ?? 0} />
+                                            qty={value?.qty ?? 0}
+                                            onChangeQty={(newQty) => {
+                                                onChangeQtyBox(index, newQty)
+                                            }} />
                                     })
                                 }
                             </View>
@@ -336,8 +352,6 @@ const ScannerBarCodePage = () => {
         </>
 
     );
-
-
 }
 
 

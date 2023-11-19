@@ -5,7 +5,8 @@ import Trash from '../../../assets/trash.svg'
 
 interface ItemBoxProps {
     boxName: string
-    qty: number
+    qty?: number
+    onChangeQty: (newQty: number) => void
     remove: () => void
 }
 
@@ -13,6 +14,7 @@ const ItemBox = (
     {
         boxName,
         qty,
+        onChangeQty,
         remove
     }: ItemBoxProps
 ) => {
@@ -31,7 +33,13 @@ const ItemBox = (
             {boxName}
         </Text>
 
-        <Input placeholder='QTD(1)' value={qty.toString()} />
+        <Input
+            placeholder='1'
+            defaultValue={qty?.toString()}
+            keyboardType="numeric"
+            onChangeText={(text) => {
+                onChangeQty(parseInt(text))
+            }} />
 
         <View style={{
             borderRadius: 10,
