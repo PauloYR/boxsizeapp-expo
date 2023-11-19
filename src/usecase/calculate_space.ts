@@ -1,6 +1,6 @@
-import { BoxData, BoxQtyInTruckData, TruckData } from "../common/firebase_data";
+import { BoxQtyInTruckData } from "../common/firebase_data";
 
-export const calculateAvailableSpace = (spaceTotalTruck: number, boxs?: BoxQtyInTruckData[]) => {
+export const getBoxSpaceTotal = (boxs?: BoxQtyInTruckData[]) => {
     let boxSpaceTotal = 0
 
     boxs?.forEach(({ dataBox, qty }) => {
@@ -11,8 +11,9 @@ export const calculateAvailableSpace = (spaceTotalTruck: number, boxs?: BoxQtyIn
         boxSpaceTotal += volumeInTheBox * (qty ?? 0)
     })
 
-    return spaceTotalTruck - boxSpaceTotal
+    return boxSpaceTotal
 }
+
 
 export const calculateVolume = (height: number, width: number, depth: number) => {
     return (

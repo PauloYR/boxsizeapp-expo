@@ -1,14 +1,31 @@
-import { View } from "react-native"
+import { View, Text } from "react-native"
 
 interface PorcentProps {
-    value: number
+    value?: number
 }
 
 const Porcent: React.FC<PorcentProps> = ({ value }) => {
+
+    var valueOk = value ?? 0
+
+    if (valueOk > 100) {
+        valueOk = 100
+    }
+
     return (
-        <View style={{ backgroundColor: "#fff", height: 20, borderRadius: 20, }}>
-            <View style={{ backgroundColor: "#3696FF", height: 20, borderRadius: 20, width: `${value}%` }}></View>
-        </View>
+        <>
+            <Text style={{
+                flex: 100,
+                textAlign: "center",
+                color: "#3696FF",
+                fontFamily: 'RobotoSerif-Bold',
+            }}>
+                Porcentagem de carregamento
+            </Text>
+            <View style={{ backgroundColor: "#fff", height: 20, borderRadius: 20, }}>
+                <View style={{ backgroundColor: (value ?? 0) > 0 ? "red" : "#3696FF", height: 20, borderRadius: 20, width: `${valueOk}%` }}></View>
+            </View>
+        </>
     )
 }
 

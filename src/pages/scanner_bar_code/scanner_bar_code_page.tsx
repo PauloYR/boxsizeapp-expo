@@ -20,7 +20,7 @@ import Porcent from './components/porcent';
 import { onValue, getDatabase, ref, onDisconnect, push, remove, update } from 'firebase/database';
 import { err } from 'react-native-svg/lib/typescript/xml';
 import { BoxData, TruckData, BoxQtyInTruckData } from '../../common/firebase_data';
-import { calculateAvailableSpace, calculateVolume } from '../../usecase/calculate_space';
+import { getBoxSpaceTotal, calculateVolume } from '../../usecase/calculate_space';
 
 interface ItemBox {
     boxName: string
@@ -131,6 +131,7 @@ const ScannerBarCodePage = () => {
     const [boxUseds, setBoxUseds] = useState<BoxQtyInTruckData[]>()
 
     const [availableArea, setAvailableArea] = useState<number>()
+    const [percentArea, setPercentArea] = useState<number>()
 
     const getSpaceTruck = useCallback((truck?: TruckData) => {
         return calculateVolume(
@@ -168,9 +169,17 @@ const ScannerBarCodePage = () => {
             setBoxUseds(boxUseds)
         }, [valueDropdownTruck, dataDropdownBox, setBoxUseds])
 
+    const getBoxSpaceTotalCallBack = useCallback(() =>
+        getBoxSpaceTotal(boxUseds) ?? 0
+        , [boxUseds])
+
     const calculateAvaliableSpaceCallback = useCallback(
-        (spaceTotalTruck: number, boxs?: BoxQtyInTruckData[]) => calculateAvailableSpace(spaceTotalTruck, boxs),
-        [calculateAvailableSpace, valueDropdownTruck, boxUseds])
+        (spaceTotalTruck: number,) => spaceTotalTruck - getBoxSpaceTotalCallBack(),
+        [getBoxSpaceTotalCallBack, valueDropdownTruck, boxUseds])
+
+    const calculateFilledSpacePercentage = useCallback(
+        (spaceTotalTruck: number,) => (getBoxSpaceTotalCallBack() / spaceTotalTruck) * 100,
+        [getBoxSpaceTotalCallBack, valueDropdownTruck, boxUseds])
 
     const getTruckSelected = useCallback(
         () => dataDropdownTruck.filter((truck) => truck.id === valueDropdownTruck?.id).at(0)
@@ -186,8 +195,10 @@ const ScannerBarCodePage = () => {
     useEffect(() => {
         const truck = getTruckSelected();
         const spaceTruck = getSpaceTruck(truck)
-        const avaliableArea = calculateAvaliableSpaceCallback(spaceTruck, boxUseds ?? [])
+        const avaliableArea = calculateAvaliableSpaceCallback(spaceTruck)
+        const percent = calculateFilledSpacePercentage(spaceTruck)
         setAvailableArea(avaliableArea)
+        setPercentArea(percent)
     }, [valueDropdownTruck, boxUseds])
 
     const [valueDropdownBox, setValueDropdownBox] = useState<BoxData>();
@@ -345,16 +356,8 @@ const ScannerBarCodePage = () => {
                                         Ler Barcode
                                     </Text>
                                 </TouchableOpacity>
-                                <Text style={{
-                                    flex: 100,
-                                    textAlign: "center",
-                                    color: "#3696FF",
-                                    fontFamily: 'RobotoSerif-Bold',
-                                }}>
-                                    Porcentagem de carregamento
-                                </Text>
                                 <Porcent
-                                    value={(availableArea ?? 0) * 100} />
+                                    value={percentArea} />
                                 <ContainerSpaceArea
                                     availableArea={availableArea} />
                                 {
