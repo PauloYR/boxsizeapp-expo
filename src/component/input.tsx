@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
     fontFamily: 'RobotoSerif-Regular',
     borderRadius: 10,
     padding: 10,
-    marginBottom: 10,
   },
 });
 

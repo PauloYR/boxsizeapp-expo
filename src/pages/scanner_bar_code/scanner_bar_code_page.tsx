@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     ScrollView,
     StatusBar,
@@ -14,48 +14,114 @@ import styleButton from '../../styles/button'
 import ItemBox from './components/item_box';
 import ContainerSpaceArea from './components/container_space_area';
 import styleToobar from '../../common/style/toolbar';
-
-interface DividerProps {
-    message?: string
-}
-
-interface PorcentProps {
-    value: number
-}
+import { Dropdown } from 'react-native-element-dropdown';
+import Divider from './components/divider';
+import Porcent from './components/porcent';
+import { onValue, getDatabase, ref, onDisconnect, update, push } from 'firebase/database';
+import { err } from 'react-native-svg/lib/typescript/xml';
+import { BoxData, TruckData } from '../../common/firebase_data';
 
 interface ItemBox {
     boxName: string
     qtd: number
 }
 
+interface DropdownStateProps {
+    label: string,
+    value: string
+}
+
 const ScannerBarCodePage = () => {
 
-    const Divider: React.FC<DividerProps> = ({ message }) => {
-        return (
-            <View style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 10
-            }} >
-                <View style={{ height: 1, backgroundColor: "#3696FF", flex: 100 }} />
-                <Text style={{ color: "#3696FF", fontFamily: 'RobotoSerif-Bold' }}>{message}</Text>
-                <View style={{ flex: 100, height: 1, backgroundColor: "#3696FF" }} />
-            </View>
-        )
-    }
+    const [dataDropdownTruck, setDataDropdownTruck] = useState<TruckData[]>([])
+    const [dataDropdownBox, setDataDropdownBox] = useState<BoxData[]>([])
+    const [dataDropdownBoxShow, setDataDropdownBoxShow] = useState<BoxData[]>([])
 
-    const Porcent: React.FC<PorcentProps> = ({ value }) => {
-        return (
-            <View style={{ backgroundColor: "#fff", height: 20, borderRadius: 20, }}>
-                <View style={{ backgroundColor: "#3696FF", height: 20, borderRadius: 20, width: `${value}%` }}></View>
-            </View>
-        )
-    }
+
+    useEffect(() => {
+        const refTruck = ref(getDatabase(), "truck");
+
+        onValue(refTruck, (snapshot) => {
+            const newData = snapshot.val();
+            console.log(newData)
+            const arrayTruck: TruckData[] = []
+            try {
+                for (let key in newData) {
+                    const value: string = key;
+                    const obj = newData[key];
+
+                    arrayTruck.push({
+                        ...obj,
+                        id: value,
+                    })
+                }
+            }
+            catch (error) {
+                console.error(error)
+            } finally {
+                setDataDropdownTruck(arrayTruck)
+            }
+        });
+
+        const refBox = ref(getDatabase(), "box");
+
+        onValue(refBox, (snapshot) => {
+            const newData = snapshot.val();
+            const arrayTruck: BoxData[] = []
+            try {
+                for (let key in newData) {
+                    const value: string = key;
+                    const obj = newData[key];
+                    arrayTruck.push({
+                        ...obj,
+                        id: value,
+                    })
+                }
+            }
+            catch (error) {
+                console.error(error)
+            } finally {
+                setDataDropdownBox(arrayTruck)
+            }
+        });
+
+        return () => {
+            onDisconnect(refTruck);
+            onDisconnect(refBox);
+        }
+    }, [])
+    const [valueDropdownTruck, setValueDropdownTruck] = useState<TruckData>();
+
+    useEffect(() => {
+        console.log(valueDropdownTruck?.name, valueDropdownTruck?.id, "truck")
+        if (!valueDropdownTruck) {
+            return
+        }
+
+        const truck = dataDropdownTruck.filter((truck) => truck.id === valueDropdownTruck?.id)[0];
+
+        if (truck?.boxs == null || typeof truck?.boxs === 'undefined') {
+            setDataDropdownBoxShow(dataDropdownBox)
+            return
+        }
+        let boxNotUseds = dataDropdownBox.filter(function (box) {
+            for (let key in truck?.boxs) {
+                const boxId: string = truck.boxs[key].id
+                if (boxId === box.id) {
+                    return false
+                }
+            }
+            return true
+        });
+        setDataDropdownBoxShow(boxNotUseds)
+    }, [valueDropdownTruck, dataDropdownBox, dataDropdownTruck])
 
     const [availableArea, setAvailableArea] = useState(20)
     const [usedArea, setUsedArea] = useState(20)
+
+
+    const [valueDropdownBox, setValueDropdownBox] = useState<BoxData>();
+
 
     const [boxAddeds, setBoxAddeds] = useState<Array<ItemBox>>([
         {
@@ -92,6 +158,21 @@ const ScannerBarCodePage = () => {
             qtd: 10
         }
     ])
+
+    const addBoxHandler = () => {
+        if (valueDropdownTruck?.name === "" || valueDropdownBox?.name === "") {
+            console.log("Preencha os dados")
+            return
+        }
+        const refTruckCurrent = ref(getDatabase(), `truck/${valueDropdownTruck?.id}/boxs`);
+
+        push(
+            refTruckCurrent, {
+            id: valueDropdownBox?.id
+        });
+
+        setValueDropdownBox(undefined)
+    }
 
 
 
@@ -132,48 +213,117 @@ const ScannerBarCodePage = () => {
                     }}>
                         <ScrollView >
                             <View style={{ height: 190 }} />
-                            <Input
-                                placeholder='Caminhão' />
-                            <Input
-                                placeholder='Caixa XPTO' />
-                            <Divider
-                                message='OU' />
-                            <TouchableOpacity
-                                style={styleButton.buttomPrimary}>
-                                <Text
-                                    style={styleButton.buttonTextPrimary}>
-                                    Ler Barcode
-                                </Text>
-                            </TouchableOpacity>
-                            <Text style={{
-                                flex: 100,
-                                textAlign: "center",
-                                color: "#3696FF",
-                                fontFamily: 'RobotoSerif-Bold',
-                            }}>
-                                Porcentagem de carregamento
-                            </Text>
-                            <Porcent
-                                value={90} />
-                            <ContainerSpaceArea
-                                availableArea={availableArea}
-                                usedArea={usedArea} />
-                            {
-                                boxAddeds.map((value, index) => {
-                                    return <ItemBox
-                                        remove={() => {
-                                            const novoArray = [
-                                                ...boxAddeds.slice(0, index),
-                                                ...boxAddeds.slice(index + 1)
-                                            ];
+                            <View style={{ display: 'flex', gap: 10, }}>
+                                <Dropdown
+                                    style={{
+                                        backgroundColor: "#fff",
+                                        borderRadius: 10,
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 8,
+                                        borderBottomWidth: 2,
+                                        borderBottomColor: '#40CFFC',
+                                    }}
+                                    placeholderStyle={{
+                                        color: "#645757"
+                                    }}
+                                    containerStyle={{
+                                        backgroundColor: "#fff"
+                                    }}
+                                    itemTextStyle={{
+                                        color: "#645757"
+                                    }}
+                                    selectedTextStyle={{
+                                        color: "#3696FF"
+                                    }}
+                                    data={dataDropdownTruck}
+                                    value={valueDropdownTruck}
+                                    maxHeight={300}
+                                    labelField="name"
+                                    valueField="id"
+                                    placeholder='Selecione o caminhão'
+                                    onChange={(value) => {
+                                        setValueDropdownTruck(value)
+                                    }}
+                                />
 
-                                            setBoxAddeds(novoArray);
-                                        }}
-                                        boxName={value.boxName}
-                                        qtd={value.qtd} />
-                                })
-                            }
-                            <View style={{ height: '35%' }} />
+                                <Dropdown
+                                    style={{
+                                        backgroundColor: "#fff",
+                                        borderRadius: 10,
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 8,
+                                        borderBottomWidth: 2,
+                                        borderBottomColor: '#40CFFC',
+                                    }}
+                                    placeholderStyle={{
+                                        color: "#645757"
+                                    }}
+                                    containerStyle={{
+                                        backgroundColor: "#fff"
+                                    }}
+                                    itemTextStyle={{
+                                        color: "#645757"
+                                    }}
+                                    selectedTextStyle={{
+                                        color: "#3696FF"
+                                    }}
+                                    data={dataDropdownBoxShow}
+                                    value={valueDropdownBox}
+                                    disable={dataDropdownBoxShow.length === 0}
+                                    maxHeight={300}
+                                    labelField="name"
+                                    valueField="id"
+                                    placeholder={dataDropdownBoxShow.length !== 0 ? 'Selecione a caixa' : 'Todas as caixas foram adicionadas'}
+                                    onChange={(value) => {
+                                        setValueDropdownBox(value)
+                                    }}
+                                />
+                                <TouchableOpacity
+                                    style={styleButton.buttomPrimary} onPress={addBoxHandler}>
+                                    <Text
+                                        style={styleButton.buttonTextPrimary}>
+                                        Adicionar Caixa
+                                    </Text>
+                                </TouchableOpacity>
+                                <Divider
+                                    message='OU' />
+                                <TouchableOpacity
+                                    style={styleButton.buttomPrimary}>
+                                    <Text
+                                        style={styleButton.buttonTextPrimary}>
+                                        Ler Barcode
+                                    </Text>
+                                </TouchableOpacity>
+                                <Text style={{
+                                    flex: 100,
+                                    textAlign: "center",
+                                    color: "#3696FF",
+                                    fontFamily: 'RobotoSerif-Bold',
+                                }}>
+                                    Porcentagem de carregamento
+                                </Text>
+                                <Porcent
+                                    value={90} />
+                                <ContainerSpaceArea
+                                    availableArea={availableArea}
+                                    usedArea={usedArea} />
+                                {
+                                    boxAddeds.map((value, index) => {
+                                        return <ItemBox
+                                            remove={() => {
+                                                const novoArray = [
+                                                    ...boxAddeds.slice(0, index),
+                                                    ...boxAddeds.slice(index + 1)
+                                                ];
+
+                                                setBoxAddeds(novoArray);
+                                            }}
+                                            boxName={value.boxName}
+                                            qtd={value.qtd} />
+                                    })
+                                }
+                            </View>
+                            <View style={{ height: '37%' }} />
                         </ScrollView>
                     </View>
                 </Container>

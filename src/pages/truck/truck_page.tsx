@@ -12,6 +12,7 @@ import { getDatabase, push, ref } from "firebase/database";
 const TruckPage = () => {
 	const listaRef = ref(getDatabase(), "truck");
 
+	const [name, setName] = useState("")
 	const [heigth, setHeigth] = useState("")
 	const [width, setWidth] = useState("")
 	const [depth, setDepth] = useState("")
@@ -22,7 +23,8 @@ const TruckPage = () => {
 			heigth: parseInt(heigth),
 			width: parseInt(width),
 			depth: parseInt(depth),
-			type
+			type,
+			name
 		});
 	}
 
@@ -66,6 +68,7 @@ const TruckPage = () => {
 						gap: 8,
 					}}
 				>
+					<Input placeholder="Nome" setValue={setName} value={name} />
 					<Input placeholder="Altura" setValue={setHeigth} value={heigth} />
 					<Input placeholder="Largura" setValue={setWidth} value={width} />
 					<Input placeholder="Profundidade" setValue={setDepth} value={depth} />

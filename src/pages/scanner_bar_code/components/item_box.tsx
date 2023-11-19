@@ -20,7 +20,6 @@ const ItemBox = (
         borderRadius: 20,
         backgroundColor: "#fff",
         padding: 5,
-        marginTop: 8,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
