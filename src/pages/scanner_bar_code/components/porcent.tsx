@@ -6,6 +6,10 @@ interface PorcentProps {
 
 const Porcent: React.FC<PorcentProps> = ({ value }) => {
 
+    if (!value) {
+        return <></>
+    }
+
     var valueOk = value ?? 0
 
     if (valueOk > 100) {
@@ -23,7 +27,7 @@ const Porcent: React.FC<PorcentProps> = ({ value }) => {
                 Porcentagem de carregamento
             </Text>
             <View style={{ backgroundColor: "#fff", height: 20, borderRadius: 20, }}>
-                <View style={{ backgroundColor: (value ?? 0) > 0 ? "red" : "#3696FF", height: 20, borderRadius: 20, width: `${valueOk}%` }}></View>
+                <View style={{ backgroundColor: (value ?? 0) > 100 ? "red" : "#3696FF", height: 20, borderRadius: 20, width: `${valueOk}%` }}></View>
             </View>
         </>
     )

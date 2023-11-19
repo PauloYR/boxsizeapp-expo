@@ -30,12 +30,13 @@ const ContainerSpaceArea = (
     if (!availableArea) {
         return <></>
     }
-
+    
     var valueOk = availableArea
     if (valueOk < 0) {
         valueOk = availableArea * -1
     }
     const value = maskMeasurement(valueOk)
+    const isMoreValue = (availableArea ?? 0) < 0
 
     return <View style={{
         borderRadius: 20,
@@ -46,8 +47,8 @@ const ContainerSpaceArea = (
         marginTop: 8,
         alignItems: 'flex-start'
     }}>
-        <Text style={{ color: (availableArea ?? 0) < 0 ? "red" : "" }}>
-            {(availableArea ?? 0) < 0 ?
+        <Text style={{ color: isMoreValue ? "red" : undefined }}>
+            {isMoreValue ?
                 `Ultrapassou a area disponivel ${value}` :
                 `Área disponível ${value}`}
         </Text>
