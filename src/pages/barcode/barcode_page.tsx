@@ -24,9 +24,9 @@ const BarCodePage = () => {
 
     const handleSubmit = () => {
         push(listaRef, {
-            heigth: parseInt(heigth),
-            width: parseInt(width),
-            depth: parseInt(depth),
+            heigth: parseFloat(heigth) / 100 ,
+            width: parseFloat(width) / 100,
+            depth: parseFloat(depth) / 100,
             name
         });
     }
